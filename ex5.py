@@ -183,19 +183,20 @@ def process_single_file(encryptor: Union[CaesarCipher, VigenereCipher], filepath
     """
     basename, ext = os.path.splitext(filepath)
 
-    output_path = None
-    result = None
-
     if mode == CONFIG_MODE_ENCRYPT:
         if ext.lower() == TXT_EXTENSION:
             output_path = f"{basename}{ENC_EXTENSION}"
-            with open(filepath) as encrypted_file:
-                result = encryptor.encrypt(encrypted_file.read())
+            with open(filepath) as plaintext_file:
+                result = encryptor.encrypt(plaintext_file.read())
+        else:
+            return
     elif mode == CONFIG_MODE_DECRYPT:
-        if ext.lower() == TXT_EXTENSION:
+        if ext.lower() == ENC_EXTENSION:
             output_path = f"{basename}{TXT_EXTENSION}"
             with open(filepath) as encrypted_file:
                 result = encryptor.decrypt(encrypted_file.read())
+        else:
+            return
     else:
         raise ValueError(f"Invalid encryption mode, got {mode}.")
 
