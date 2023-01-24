@@ -214,27 +214,3 @@ def processDirectory(dir_path: str) -> None:
     for filename in os.listdir(dir_path):
         filepath = os.path.join(dir_path, filename)
         process_single_file(encryptor, filepath, mode)
-
-# ---------- Main Entry Point ---------- #
-
-
-def main():
-    data = "Mtm is the BEST!"
-
-    encryptor = CaesarCipher(3)
-
-    encrypted = encryptor.encrypt(data)
-    print(encrypted, encryptor.decrypt(encrypted), sep="\n", end="\n\n")
-
-    vc = VigenereCipher([7, 8, 11, 13, -2, 4])
-    encrypted = vc.encrypt("come to Rivendell!")
-    print(encrypted, vc.decrypt(encrypted), sep="\n", end="\n\n")
-
-    vc = getVigenereFromStr("python rules, C drools")
-    encrypted = vc.encrypt("JK, C is awesome")
-    print(encrypted, vc.decrypt(encrypted), sep="\n", end="\n\n")
-
-
-if __name__ == '__main__':
-    main()
-
