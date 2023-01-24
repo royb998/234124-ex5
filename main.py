@@ -1,12 +1,26 @@
-
+import json
+import os
 # ---------- Imports ---------- #
 
-from typing import List
+from typing import List, Dict, Union
 
 # ---------- Consts ---------- #
 
-ALPHABET_SIZE = 26
+ALPHABET_SIZE = ord("z") + 1 - ord("a")
 
+# Config file consts.
+CONFIG_FILENAME = "config.json"
+CONFIG_KEY_TYPE = "type"
+CONFIG_KEY_MODE = "mode"
+CONFIG_KEY_KEY = "key"
+
+CONFIG_TYPE_CAESAR = "Caesar"
+CONFIG_TYPE_VIGENERE = "Vigenere"
+CONFIG_MODE_ENCRYPT = "encrypt"
+CONFIG_MODE_DECRYPT = "decrypt"
+
+TXT_EXTENSION = ".txt"
+ENC_EXTENSION = ".enc"
 
 # ---------- Classes ---------- #
 
@@ -135,6 +149,71 @@ def getVigenereFromStr(keyString: str) -> VigenereCipher:
 
     return VigenereCipher(keys)
 
+
+def _get_ecnryptor_from_config(config: Dict[str, str]) -> Union[CaesarCipher, VigenereCipher]:
+    """
+    Create an appropriate encryptor instance based on the given configuration.
+
+    :param config: Configuration dict for the encryption.
+    """
+    encryption_type = config[CONFIG_KEY_TYPE]
+    encryption_key = config[CONFIG_KEY_KEY]
+
+    if encryption_type == CONFIG_TYPE_CAESAR:
+        return CaesarCipher(encryption_key)
+    elif encryption_type == CONFIG_TYPE_VIGENERE:
+        if isinstance(encryption_key, str):
+            return getVigenereFromStr(encryption_key)
+        elif isinstance(encryption_key, list):
+            return VigenereCipher(encryption_key)
+        else:
+            raise TypeError("Encryption key for Vigenere cipher should be either list or str.")
+    else:
+        raise ValueError(f"Invalid encryption method, got {encryption_type}.")
+
+
+def process_single_file(encryptor: Union[CaesarCipher, VigenereCipher], filepath: str, mode: str) -> None:
+    """
+    Process a single file for the encryption/decryption process.
+
+    :param encryptor: Encryptor object.
+    :param filepath: Path to the file to encrypt/decrypt.
+    :param mode: "encrypt" for encryption, "decrypt" for decryption.
+    :raise ValueError: In case of invalid enc/dec mode.
+    """
+    basename, ext = os.path.splitext(filepath)
+
+    output_path = None
+    result = None
+
+    if mode == CONFIG_MODE_ENCRYPT:
+        if ext.lower() == TXT_EXTENSION:
+            output_path = f"{basename}{ENC_EXTENSION}"
+            with open(filepath) as encrypted_file:
+                result = encryptor.encrypt(encrypted_file.read())
+    elif mode == CONFIG_MODE_DECRYPT:
+        if ext.lower() == TXT_EXTENSION:
+            output_path = f"{basename}{TXT_EXTENSION}"
+            with open(filepath) as encrypted_file:
+                result = encryptor.decrypt(encrypted_file.read())
+    else:
+        raise ValueError(f"Invalid encryption mode, got {mode}.")
+
+    with open(output_path, "wt") as decrypted:
+        decrypted.write(result)
+
+
+def processDirectory(dir_path: str) -> None:
+    config_path = os.path.join(dir_path, CONFIG_FILENAME)
+    with open(config_path, "rt") as config_file:
+        config = json.load(config_file)
+
+    encryptor = _get_ecnryptor_from_config(config)
+    mode = config[CONFIG_KEY_MODE]
+
+    for filename in os.listdir(dir_path):
+        filepath = os.path.join(dir_path, filename)
+        process_single_file(encryptor, filepath, mode)
 
 # ---------- Main Entry Point ---------- #
 
