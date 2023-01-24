@@ -1,4 +1,8 @@
 
+# ---------- Imports ---------- #
+
+from typing import List
+
 # ---------- Consts ---------- #
 
 ALPHABET_SIZE = 26
@@ -61,6 +65,60 @@ class CaesarCipher:
         return self._caesar(ciphertext, False)
 
 
+class VigenereCipher:
+    def __init__(self, keys: List[int]):
+        self._caesar_encryptors = [CaesarCipher(key) for key in keys]
+
+    def _vigenere(self, data: str, encrypt: bool) -> str:
+        """
+        Inner implementation of vigenere cypher, allowing either encryption or
+        decryption.
+
+        :param data: Data to encrypt.
+        :param encrypt: True for encryption, False for decryption.
+        :return: The encrypted/decrypted data.
+        """
+        result = ""
+
+        count = 0
+
+        for c in data:
+            if not c.isalpha():
+                result += c
+                continue
+
+            i = count % len(self._caesar_encryptors)
+
+            if encrypt:
+                result += self._caesar_encryptors[i].encrypt(c)
+            else:
+                result += self._caesar_encryptors[i].decrypt(c)
+
+            count += 1
+
+        return result
+
+    def encrypt(self, plaintext: str) -> str:
+        """
+        Encrypt the given `data` using vigenere cypher with the keys bound to
+        the current instance.
+
+        :param plaintext: Data to encrypt.
+        :return: Data encrypted using vigenere cypher.
+        """
+        return self._vigenere(plaintext, True)
+
+    def decrypt(self, ciphertext: str) -> str:
+        """
+        Decrypt the given `data` using vigenere cypher with the keys bound to
+        the current instance.
+
+        :param ciphertext: Data to encrypt.
+        :return: Data encrypted using vigenere cypher.
+        """
+        return self._vigenere(ciphertext, False)
+
+
 # ---------- Main Entry Point ---------- #
 
 
@@ -71,6 +129,10 @@ def main():
 
     encrypted = encryptor.encrypt(data)
     print(encrypted, encryptor.decrypt(encrypted))
+
+    vc = VigenereCipher([7, 8, 11, 13, -2, 4])
+    encrypted = vc.encrypt("come to Rivendell!")
+    print(encrypted, vc.decrypt(encrypted))
 
 
 if __name__ == '__main__':
