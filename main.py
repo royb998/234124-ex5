@@ -7,7 +7,7 @@ ALPHABET_SIZE = 26
 # ---------- Classes ---------- #
 
 
-class CaesarCypher:
+class CaesarCipher:
     def __init__(self, key):
         self._key = key
 
@@ -40,25 +40,25 @@ class CaesarCypher:
 
         return result
 
-    def encrypt(self, data: str) -> str:
+    def encrypt(self, plaintext: str) -> str:
         """
         Encrypt the given `data` using caesar cypher with the key bound to the
         current instance.
 
-        :param data: Data to encrypt.
+        :param plaintext: Data to encrypt.
         :return: Data encrypted using caesar cypher.
         """
-        return self._caesar(data, True)
+        return self._caesar(plaintext, True)
 
-    def decrypt(self, data: str) -> str:
+    def decrypt(self, ciphertext: str) -> str:
         """
         Decrypt the given `data` using caesar cypher with the key bound to the
         current instance.
 
-        :param data: Data to encrypt.
+        :param ciphertext: Data to encrypt.
         :return: Data encrypted using caesar cypher.
         """
-        return self._caesar(data, False)
+        return self._caesar(ciphertext, False)
 
 
 # ---------- Main Entry Point ---------- #
@@ -67,7 +67,7 @@ class CaesarCypher:
 def main():
     data = "Mtm is the BEST!"
 
-    encryptor = CaesarCypher(3)
+    encryptor = CaesarCipher(3)
 
     encrypted = encryptor.encrypt(data)
     print(encrypted, encryptor.decrypt(encrypted))
