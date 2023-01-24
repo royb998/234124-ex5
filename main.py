@@ -118,6 +118,23 @@ class VigenereCipher:
         """
         return self._vigenere(ciphertext, False)
 
+# ---------- Functions ---------- #
+
+
+def getVigenereFromStr(keyString: str) -> VigenereCipher:
+    """
+    Create a vigenere cipher object using a text-based key.
+    Each character in the given key is mapped to a corresponding integer key by
+    index in the alphabet.
+
+    :param keyString: String to generate keys from.
+    """
+    keyString = keyString.lower()
+
+    keys = [ord(c) - ord("a") for c in keyString if c.isalpha()]
+
+    return VigenereCipher(keys)
+
 
 # ---------- Main Entry Point ---------- #
 
@@ -128,11 +145,15 @@ def main():
     encryptor = CaesarCipher(3)
 
     encrypted = encryptor.encrypt(data)
-    print(encrypted, encryptor.decrypt(encrypted))
+    print(encrypted, encryptor.decrypt(encrypted), sep="\n", end="\n\n")
 
     vc = VigenereCipher([7, 8, 11, 13, -2, 4])
     encrypted = vc.encrypt("come to Rivendell!")
-    print(encrypted, vc.decrypt(encrypted))
+    print(encrypted, vc.decrypt(encrypted), sep="\n", end="\n\n")
+
+    vc = getVigenereFromStr("python rules, C drools")
+    encrypted = vc.encrypt("JK, C is awesome")
+    print(encrypted, vc.decrypt(encrypted), sep="\n", end="\n\n")
 
 
 if __name__ == '__main__':
